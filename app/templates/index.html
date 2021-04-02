@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+  <div class="container pt-4">
+    <div class="row  p-0 mt-4">
+      <div class="col-lg-4 mx-auto shadow p-0">
+        <div class="alert alert-info">
+          <h2>Add New TODO</h2>
+        </div>
+        <div class="p-4">
+          <form action="{% url 'add_todo' %}" method="POST">
+            {% csrf_token %}
+            {{form.as_p}}
+            <hr>
+            <input type="submit" value="ADD" class="btn btn-info">
+          </form>
+        </div>
+      </div>
+
+
+
+      <div class="col">
+        <div class="border">
+
+          {% if todos|length == 0 %}
+
+          <div class="p-4">
+            <br>
+            <br>
+            <div class="alert alert-info text-center">
+              <p class="" style="font-size: 30px;">No Todos</p>
+            </div>
+            <br>
+            <br>
+          </div>
+
+          {%else%}
+          <div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Due</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {% for todo in todos %}
+                <tr>
+                  <td>{{forloop.counter}}</td>
+
+                  {% if todo.status == 'C' %}
+                  <td><strike>{{todo.title}}</strike></td>
+                  {% else %}
+                  <td>{{todo.title}}</td>
+                  {% endif %}
+
+
+                  <td>
+                    {% if todo.status == 'C'%}
+                    ✅
+                    {%else%}
+                    🕒
+                    {%endif%}
+                  </td>
+                  <td>{{todo.priority}}</td>
+                  {% if todo.status == 'C'%}
+                  <td><strike>{{todo.due}}</strike></td>
+
+                  {%else%}
+                  <td><span style="color:aliceblue; background-color: #dc3545;
+                    border-radius: 4px; padding: 4px;">{{todo.due|timeuntil}}</span></td>
+
+                  {%endif%}
+                  <td>
+                    <a href="{% url 'delete_todo' todo.id %}" title="Delete" class="">🗑️</a>
+                    {% if todo.status == 'P'%}
+                    <a href="{% url 'change_todo' id=todo.id status='C' %}" title="Mark Completed" class="">✅</a>
+                    {%else%}
+                    <a href="{% url 'change_todo' id=todo.id status='P' %}" title="Mark Pending" class="">🕒</a>
+                    {%endif%}
+                  </td>
+                </tr>
+                {%endfor%}
+
+
+              </tbody>
+            </table>
+          </div>
+          {%endif%}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    var date_input = $('input[name="due"]'); //our date input has the name "date"
+    var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
+    var options = {
+      dateFormat: 'yy-mm-dd',
+    };
+    date_input.datepicker(options);
+  })
+</script>
+{% endblock %}
